@@ -1,3 +1,4 @@
 rootProject.name = 'microservices-example'
+include ':example-service-registry'
 include ':example-services:department-service'
 include ':example-services:user-service'
