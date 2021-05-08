@@ -25,7 +25,7 @@ dependencies {
   runtimeOnly 'com.h2database:h2'
 
   compileOnly 'org.projectlombok:lombok'
-  implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+  compileOnly 'org.mapstruct:mapstruct:1.4.2.Final'
 
   annotationProcessor 'org.projectlombok:lombok'
   annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
@@ -36,4 +36,12 @@ dependencies {
 
 test {
   useJUnitPlatform()
+}
+
+sourceSets {
+  main {
+    java {
+      srcDirs = ['src/main/java', 'build/generated/sources/annotationProcessor/java/main']
+    }
+  }
 }
