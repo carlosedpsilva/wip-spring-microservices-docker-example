@@ -11,10 +11,59 @@ spring:
           uri: lb://USER-SERVICE
           predicates:
             - Path=/api/v1/users/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: USER-SERVICE
+                fallbackuri: forward:/userServiceFallBack
         - id: DEPARTMENT-SERVICE
           uri: lb://DEPARTMENT-SERVICE
           predicates:
             - Path=/api/v1/departments/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: DEPARTMENT-SERVICE
+                fallbackuri: forward:/departmentServiceFallBack
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        register-health-indicator: true
+        sliding-window-size: 10
+        minimum-number-of-calls: 10
+        permitted-number-of-calls-in-half-open-state: 5
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 2s
+        failure-rate-threshold: 50
+        ring-buffer-size-in-closed-state: 10
+        ring-buffer-size-in-half-open-state: 3
+        eventConsumerBufferSize: 20
+        slow-call-duration-threshold: 200ms
+        slow-call-rate-threshold: 30
+    instances:
+      USER-SERVICE:
+        base-config: default
+      DEPARTMENT-SERVICE:
+        base-config: default
+        failure-rate-threshold: 60
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 10s
+        cancel-running-future: false
+    instances:
+      USER-SERVICE:
+        base-config: default
+      DEPARTMENT-SERVICE:
+        base-config: default
+        timeout-duration: 4s
+
+management:
+  endpoints.web.exposure.include: '*'
+  endpoint.health.show-details: always
+  health.circuitbreakers.enabled: true
 
 eureka:
   client:
